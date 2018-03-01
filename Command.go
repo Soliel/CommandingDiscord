@@ -3,7 +3,6 @@ package CommandingDiscord
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"time"
 )
 
 type (
@@ -27,14 +26,13 @@ type (
 		truncate  bool
 		truncLen  int
 		cooldowns cooldownMap
-		cdTick    *time.Ticker
 	}
 )
 
 //TODO: Export settings to an external file and pull from it to find truncate and truncate length.
 
 func NewCommandHandler() *CommandHandler {
-	return &CommandHandler{make(commandMap), false, 0, make(cooldownMap), time.NewTicker(time.Second)}
+	return &CommandHandler{make(commandMap), false, 0, make(cooldownMap)}
 }
 
 func (handler CommandHandler) isTrunc() bool {

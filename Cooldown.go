@@ -23,9 +23,10 @@ func (handler CommandHandler) startCooldown(user string, cmd command) {
 }
 
 func (handler CommandHandler) startCooldownTicker() {
-	defer handler.cdTick.Stop()
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 
-	for tick := range handler.cdTick.C {
+	for tick := range ticker.C {
 		for key, value := range handler.cooldowns {
 			for key2, value2 := range value {
 				if tick.Sub(value2) >= 0 {
