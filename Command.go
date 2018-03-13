@@ -26,13 +26,14 @@ type (
 		truncate  bool
 		truncLen  int
 		cooldowns cooldownMap
+		prefix	  string
 	}
 )
 
 //TODO: Export settings to an external file and pull from it to find truncate and truncate length.
 
 func NewCommandHandler() *CommandHandler {
-	return &CommandHandler{make(commandMap), false, 0, make(cooldownMap)}
+	return &CommandHandler{make(commandMap), false, 0, make(cooldownMap), "~"}
 }
 
 func (handler CommandHandler) isTrunc() bool {
