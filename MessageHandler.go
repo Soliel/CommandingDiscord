@@ -1,9 +1,9 @@
 package CommandingDiscord
 
 import (
-	"strings"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"strings"
 )
 
 //This is an optional message handler and must be wrapped into a handler with scope allowing for BotID and handler to be passed in without explicitly stating it in the onMessageRecieved Function
@@ -19,8 +19,8 @@ func onMessageRecieved(s *discordgo.Session, m *discordgo.MessageCreate) {
 	handleMessages(s, m, BotID, handler)
 }
 
- */
-func handleMessages(s *discordgo.Session, m *discordgo.MessageCreate, BotID string, handler CommandHandler) {
+*/
+func HandleMessages(s *discordgo.Session, m *discordgo.MessageCreate, BotID string, handler CommandHandler) {
 
 	if m.Author.ID == BotID {
 		return
@@ -64,16 +64,16 @@ func handleMessages(s *discordgo.Session, m *discordgo.MessageCreate, BotID stri
 	}
 	name := args[0]
 
-	command, found := handler.get(name)
+	command, found := handler.Get(name)
 	if !found {
 		return
 	}
 
-	if command.hasCooldown() {
-		if handler.isOnCooldown(m.Author.ID, *command) {
+	if command.HasCooldown() {
+		if handler.IsOnCooldown(m.Author.ID, name) {
 			return
 		}
-		handler.startCooldown(m.Author.ID, *command)
+		handler.StartCooldown(m.Author.ID, name)
 	}
 
 	channel, err := s.State.Channel(m.ChannelID)
@@ -93,7 +93,6 @@ func handleMessages(s *discordgo.Session, m *discordgo.MessageCreate, BotID stri
 	if err == nil {
 		ctx.Guild = guild
 	}
-
 
 	//pass command pointer and run the function
 	c := command.cmdFunc

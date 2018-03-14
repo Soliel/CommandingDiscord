@@ -1,6 +1,7 @@
 package CommandingDiscord
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 )
@@ -26,38 +27,63 @@ type (
 		truncate  bool
 		truncLen  int
 		cooldowns cooldownMap
-		prefix	  string
+		prefix    string
 	}
 )
 
 //TODO: Export settings to an external file and pull from it to find truncate and truncate length.
 
-func NewCommandHandler() *CommandHandler {
-	return &CommandHandler{make(commandMap), false, 0, make(cooldownMap), "~"}
+func NewCommandHandler() (error, *CommandHandler) {
+	commandHandler := &CommandHandler{make(commandMap), false, 0, make(cooldownMap), "~"}
+
+	if commandHandler == nil {
+		return errors.New("unable to create command handler"), nil
+	} else {
+		return nil, commandHandler
+	}
 }
 
-func (handler CommandHandler) isTrunc() bool {
+func (handler CommandHandler) ToString() string {
+	handlerstring := fmt.Sprintf("Prefix: %s\nTruncate: %t\nTruncate Length: %d\ncommandMap: %v\ncooldownMap: %v",
+		handler.prefix,
+		handler.truncate,
+		handler.truncLen,
+		handler.commands,
+		handler.cooldowns)
+
+	return handlerstring
+}
+
+func (handler CommandHandler) IsTrunc() bool {
 	return handler.truncate
 }
 
-func (handler CommandHandler) getTruncLength() int {
+func (handler CommandHandler) GetTruncLength() int {
 	return handler.truncLen
 }
 
-func (handler CommandHandler) getCommands() commandMap {
+func (handler CommandHandler) SetTruncLength(newlength int) error {
+	handler.truncLen = newlength
+	if handler.truncLen != newlength {
+		return errors.New("unable to set new trunclength")
+	} else {
+		return nil
+	}
+}
+
+func (handler CommandHandler) GetCommands() commandMap {
 	return handler.commands
 }
 
-func (handler CommandHandler) get(name string) (*command, bool) {
+func (handler CommandHandler) Get(name string) (*command, bool) {
 	cmd, found := handler.commands[name]
 	return &cmd, found
 }
 
-func (handler CommandHandler) register(name string, cmd func(Context), cooldown int) {
+func (handler CommandHandler) Register(name string, cmd func(Context), cooldown int) error {
 	_, exists := handler.commands[name]
 	if exists {
-		fmt.Println("Cannot register multiple commands to a single name. The cmd: ", name, " will not be registered.")
-		return
+		return errors.New("cannot register multiple commands to a single name. The cmd: " + name + " will not be registered.")
 	}
 
 	handler.commands[name] = command{cmd, cooldown}
@@ -66,9 +92,10 @@ func (handler CommandHandler) register(name string, cmd func(Context), cooldown 
 			handler.commands[name[:handler.truncLen]] = command{cmd, cooldown}
 		}
 	}
+	return nil
 }
 
-func (cmd command) hasCooldown() bool {
+func (cmd command) HasCooldown() bool {
 	if cmd.cooldown > 0 {
 		return true
 	}

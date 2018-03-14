@@ -5,10 +5,10 @@ import (
 )
 
 type (
-	cooldownMap map[string]map[command]time.Time //Stores a map of each users current cooldowns.
+	cooldownMap map[string]map[string]time.Time //Stores a map of each users current cooldowns.
 )
 
-func (handler CommandHandler) isOnCooldown(user string, cmd command) bool {
+func (handler CommandHandler) IsOnCooldown(user string, cmd string) bool {
 	if handler.cooldowns[user][cmd].IsZero() {
 		return false
 	}
@@ -18,11 +18,11 @@ func (handler CommandHandler) isOnCooldown(user string, cmd command) bool {
 	return false
 }
 
-func (handler CommandHandler) startCooldown(user string, cmd command) {
-	handler.cooldowns[user][cmd] = time.Now().Add(time.Duration(cmd.cooldown) * time.Second)
+func (handler CommandHandler) StartCooldown(user string, cmd string) {
+	handler.cooldowns[user][cmd] = time.Now().Add(time.Duration(handler.commands[cmd].cooldown) * time.Second)
 }
 
-func (handler CommandHandler) startCooldownTicker() {
+func (handler CommandHandler) StartCooldownTicker() {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
