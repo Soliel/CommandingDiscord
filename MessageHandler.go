@@ -20,7 +20,7 @@ func onMessageRecieved(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 */
-func HandleMessages(s *discordgo.Session, m *discordgo.MessageCreate, BotID string, handler CommandHandler) {
+func HandleMessages(s *discordgo.Session, m *discordgo.MessageCreate, BotID string, handler *CommandHandler) {
 
 	if m.Author.ID == BotID {
 		return
